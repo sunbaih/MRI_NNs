@@ -9,8 +9,8 @@ Created on Fri Sep  8 14:25:23 2023
 import os
 import shutil 
 
-folderpath = "/Users/baihesun/cancer_data/TCGA-GBM_all_niftis/"
-new_folder_path = "/Users/baihesun/cancer_data/BRATS_TCGA_GBM_all_niftis/"
+folderpath = "/users/bsun14/data/bsun14/TCGA-GBM_all_niftis/"
+new_folder_path = "/users/bsun14/data/bsun14/BRATS_TCGA_GBM_all_niftis/"
 
 os.chdir(folderpath)
 

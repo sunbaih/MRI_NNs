@@ -1,7 +1,7 @@
+import SimpleITK as sitk
 import os
 import torch 
 import SimpleITK as sitk
-import nibabel as nib 
 from sklearn.model_selection import train_test_split
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
@@ -10,7 +10,37 @@ from skimage import measure
 from stl import mesh
 from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
 
-def read_nifti_data(folder_path, output_shape = [10, 10, 10]):
+def average_of_three_entries(arr):
+    result = []
+    
+    for i in range(0, len(arr), 3):
+        chunk = arr[i:i+3]
+        if len(chunk) == 3:
+            avg = sum(chunk) / 3
+            result.append(avg)
+    
+    return torch.Tensor(result)
+
+
+def reconstruct_nifti(patient_id, predicted_array, output_size = [155, 240, 240]):
+    orig_2d_img_path = f"/users/bsun14/data/bsun14/BRATS_TCGA_GBM_all_niftis/{patient_id}.nii.gz"
+    orig_2d_img = sitk.ReadImage(orig_2d_img_path)
+    origin = orig_2d_img.GetOrigin()
+    spacing = orig_2d_img.GetSpacing()
+    direction = orig_2d_img.GetDirection()
+    
+    output_array = predicted_array.view(output_size)
+    print(output_array.shape)
+    predicted_img = sitk.GetImageFromArray(output_array)
+
+    predicted_img.SetOrigin(origin)
+    predicted_img.SetSpacing(spacing)
+    predicted_img.SetDirection(direction)
+
+    sitk.WriteImage(predicted_img, f"/users/bsun14/data/bsun14/Pipelines/cancer_models/basic_nn/predictions/{patient_id}.nii")
+
+
+def read_nifti_data(folder_path, output_shape = [155,240,240]):
     """
     Parameters
     ----------
@@ -44,7 +74,7 @@ def read_nifti_data(folder_path, output_shape = [10, 10, 10]):
     return nifti_arrays, patient_ids
 
 
-def reshape_nifti(nifti_img, output_shape = [155, 240, 240]):
+def reshape_nifti(nifti_img, output_shape):
     """
     Input 2D images are not consistent in terms of length, width, and height of stacked images. 
     Resize images for consistency, save to folder. 
@@ -54,7 +84,6 @@ def reshape_nifti(nifti_img, output_shape = [155, 240, 240]):
     
     return resampled_img 
 
-            
             
 class TumorData(Dataset):
     def __init__(self, data_path_2d, data_path_3d):
