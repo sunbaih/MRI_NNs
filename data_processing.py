@@ -12,7 +12,6 @@ from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
 
 def average_of_three_entries(arr):
     result = []
-    
     for i in range(0, len(arr), 3):
         chunk = arr[i:i+3]
         if len(chunk) == 3:
@@ -20,7 +19,6 @@ def average_of_three_entries(arr):
             result.append(avg)
     
     return torch.Tensor(result)
-
 
 def reconstruct_nifti(patient_id, predicted_array, output_size = [155, 240, 240]):
     orig_2d_img_path = f"/users/bsun14/data/bsun14/BRATS_TCGA_GBM_all_niftis/{patient_id}.nii.gz"
@@ -40,7 +38,7 @@ def reconstruct_nifti(patient_id, predicted_array, output_size = [155, 240, 240]
     sitk.WriteImage(predicted_img, f"/users/bsun14/data/bsun14/Pipelines/cancer_models/basic_nn/predictions/{patient_id}.nii")
 
 
-def read_nifti_data(folder_path, output_shape = [155,240,240]):
+def read_nifti_data(folder_path, output_shape = [155, 240, 240]): #[155, 240, 240]
     """
     Parameters
     ----------
@@ -150,7 +148,6 @@ class TumorData(Dataset):
             
         return patient_id, data_2d, data_3d 
             
-        
 
 def get_dataloader(data_path_X = "/Users/baihesun/cancer_data/TCIA_manual_segmentations", 
                    data_path_Y = "/Users/baihesun/cancer_data/BRATS_TCGA_GBM_all_niftis", 
